@@ -35,15 +35,14 @@ have not been updated for 15 months. This is problematic and several issues aris
 
 This repository aims to solve those issues.
 
-
-
-
 ## The base image.
+
 `$ docker pull surister/django-meinheld-gunicorn:base-python3.9.6-alpine3.14`
 
-This image is the base of all other alpine images. 
+This image is the base of all other alpine images.
 
-This one can also be used with flask, it's like the one you would find in https://github.com/tiangolo/meinheld-gunicorn-docker
+This one can also be used with flask, it's like the one you would find
+in https://github.com/tiangolo/meinheld-gunicorn-docker
 but updated.
 
 All the other images are Django focused.
@@ -59,13 +58,14 @@ We run the project attaching the source files in a volume.
 `$ sudo docker run -d --name sampletest -p 8000:80 -v ~/sampletest/:/app/ -e MODULE_NAME=sampletest.wsgi surister/django-meinheld-gunicorn:python3.9.6-alpine3.14 `
 
 What does it do?
+
 - Runs a Django container with gunicorn and mainheld named `sampletest`.
 - It is visible trough the port 8000
 - The source files are passed at runtime, changes to your local files will affect the container after a restart.
-- We pass a $MODULE_NAME env variable with the name of your main Django folder (The one that hold `urls.py`, `settings.py`, `wsgi.py`...) 
+- We pass a $MODULE_NAME env variable with the name of your main Django folder (The one that hold `urls.py`
+  , `settings.py`, `wsgi.py`...)
   this is needed for gunicorn.
 
-  
 We curl the port
 
 `$ curl localhost:8000`
@@ -79,12 +79,12 @@ We curl the port
     <title>The install worked successfully! Congratulations!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="/static/admin/css/fonts.css">
-...
+    ...
 ```
 
 ### Passing source files at build time
 
-If you do not want to pass the source files in a attached volume, you can extend the image and pass them at build time:
+If you do not want to pass the source files in an attached volume, you can extend the image and the files at build time:
 
 ```dockerfile
 FROM surister/django-meinheld-gunicorn:python3.9.6-alpine3.14
@@ -92,6 +92,7 @@ FROM surister/django-meinheld-gunicorn:python3.9.6-alpine3.14
 COPY . /app/
 
 ```
+
 With a tree project like this:
 
 ```
@@ -105,6 +106,7 @@ With a tree project like this:
     ├── urls.py
     └── wsgi.py
 ```
+
 ```bash
 $ sudo docker build -t django-test .
 ```
@@ -113,9 +115,10 @@ $ sudo docker build -t django-test .
 $ sudo docker run -e MODULE_NAME=django-test.wsgi -p 8000:80 django-test
 ```
 
-### Installing extra packages.
+### <a name="installingpackages"></a>Installing extra packages.
+
 The images come with Gunicorn, Meinheld and Django installed, besides this, depending on the flavor they may have extra
-packages. 
+packages.
 
 For example `python3.9.6-alpine3.14-postgresql` comes with postgreSQL psycopg2 support out of the box.
 
@@ -138,41 +141,47 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir -r requirements.txt
 ```
+Running this image is the same procedure as running for example: `python3.9.6-alpine3.14-postgresql`
+```bash
+$ sudo docker run -d --name sampletest -p 8000:80 -v ~/sampletest/:/app/ -e MODULE_NAME=sampletest.wsgi mynewlybuildimage
+```
+
 
 Now, this will work for some packages but odds are that they some will fail at build time because of missing
-dependencies. 
+dependencies.
 
-There is no generic Dockerfile that will build every package while being small, you will have to 
-tweak it to find the correct build for you.
+There is no generic Dockerfile that will build every package while maintaining its small size, you will have to tweak it to find the
+correct build for your project.
 
 Let me walk you trough a real world example.
 
 Let's take for example this Pipfile:
-```yaml
-[packages]
-django = "*"
-django-cors-headers = "*"
-djangorestframework = "*"
-django-filter = "*"
-markdown = "*"
-celery = "*"
-paho-mqtt = "*"
-psycopg2 = "*"
-django-allauth = "*"
-django-debug-toolbar = "*"
-dj-rest-auth = "*"
 
-[dev-packages]
-flake8 = "*"
-flake8-import-order = "*"
-requests = "*"
-factory-boy = "*"
-faker = "*"
-django-extensions = "*"
-drf-yasg = "*"
-flake8-django = "*"
-coverage = "*"
-pygraphviz = "*"
+```yaml
+[ packages ]
+  django = "*"
+  django-cors-headers = "*"
+  djangorestframework = "*"
+  django-filter = "*"
+  markdown = "*"
+  celery = "*"
+  paho-mqtt = "*"
+  psycopg2 = "*"
+  django-allauth = "*"
+  django-debug-toolbar = "*"
+  dj-rest-auth = "*"
+
+  [ dev-packages ]
+  flake8 = "*"
+  flake8-import-order = "*"
+  requests = "*"
+  factory-boy = "*"
+  faker = "*"
+  django-extensions = "*"
+  drf-yasg = "*"
+  flake8-django = "*"
+  coverage = "*"
+  pygraphviz = "*"
 ```
 
 Using pipenv we turn it into a `requirements.txt`
@@ -181,8 +190,8 @@ Using pipenv we turn it into a `requirements.txt`
 $ pipenv run pip freeze > requirements.txt
 ```
 
-`requirements.txt` Note that this also have dev packages, in production we wouldn't want packages such as flake8, coverage, drf-yasg but
-for training purposes it is alright.
+`requirements.txt` Note that this also have dev packages, in production we wouldn't want packages such as flake8,
+coverage, drf-yasg but for training purposes it is alright.
 
 ```yaml
 amqp==5.0.6
@@ -253,11 +262,11 @@ urllib3==1.26.6
 vine==5.0.0
 wcwidth==0.2.5
 ```
+If we try to build it
+the first problem we find is with `cryptography==3.4.7`.
 
-The first problem we find is with `cryptography==3.4.7`. 
-
-It outputs: `Fatal error: ffi.h: No such file or directory` with a quick Google search I find that `ffi.h` lives in
-the package `libffi-dev`
+It outputs: `Fatal error: ffi.h: No such file or directory` with a quick Google search I find that `ffi.h` lives in the
+package `libffi-dev`
 
 We add it to our build and try again.
 
@@ -270,14 +279,57 @@ RUN apk add --no-cache --virtual .build-deps \
 
 You probably get the deal by now: rinse and repeat.
 
-We find new missing dependencies: 
+We find new missing dependencies:
+
 - `cryptographic` is missing `rust`, `cargo` and `openssl-dev`
 
 - `kiwisolver` is missing `g++`
 
-- `pygraphviz` is missing `graphviz`
+- `pygraphviz` is missing `graphviz-dev`
 
+And we finally manage to build it with:
 
+```dockerfile
+FROM surister/django-meinheld-gunicorn:python3.9.6-alpine3.14-postgresql
+
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    rust \
+    cargo \
+    g++ \
+    graphviz-dev \
+    openssl-dev \
+ && apk del --no-cache .build-deps
+ 	    
+COPY . /app/
+WORKDIR /app
+
+RUN pip install --no-cache-dir -r requirements.txt
+```
+
+## Docker-compose
+
+A simple Django docker-compose example:
+
+```yaml
+version: "3.9"
+
+services:
+  django:
+    image: surister/django-meinheld-gunicorn:python3.9.6-alpine3.14
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    volumes:
+      - /home/surister/django-test/django_project:/app/
+    environment:
+      - MODULE_NAME=django_project.wsgi
+
+```
+
+A Django docker-compose example following the [Installing extra packages](#installingpackages).
 ## License
 
 This project is licensed under the terms of the MIT license.

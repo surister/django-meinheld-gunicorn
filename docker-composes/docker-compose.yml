@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  django:
+    image: surister/django-meinheld-gunicorn:python3.9.6-alpine3.14
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    volumes:
+      - /home/surister/django-test/django_project:/app/
+    environment:
+      - MODULE_NAME=django_project.wsgi
