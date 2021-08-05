@@ -98,3 +98,7 @@ RUN apk add --no-cache --virtual .build-deps [package1] [package2] [package3] ..
     && apk del -build-deps [package1] [package2] [package3] ... [packageN]
 
 ```
+
+## License
+
+This project is licensed under the terms of the MIT license.
