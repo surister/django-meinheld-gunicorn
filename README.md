@@ -93,9 +93,8 @@ What does it do?
 - Runs a Django container with gunicorn and mainheld named `sampletest`.
 - It is visible trough the port 8000
 - The source files are passed at runtime, changes to your local files will affect the container after a restart.
-- We pass a $MODULE_NAME env variable with the name of your main Django folder (The one that hold `urls.py`
-  , `settings.py`, `wsgi.py`...)
-  this is needed for gunicorn.
+- We pass a `MODULE_NAME` env variable with the name of your main Django folder (The one that holds 
+  `urls.py`, `settings.py`, `wsgi.py`...) this is needed for gunicorn.
 
 We curl the port
 
@@ -110,6 +109,8 @@ We curl the port
     <title>The install worked successfully! Congratulations!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="/static/admin/css/fonts.css">
+  
+  
     ...
 ```
 
