@@ -489,15 +489,15 @@ image is 84.1MB, as you can see images do to grow much when you install a lot of
 
 ## TODO
 
-- [x] Update and test tiangolo's alpine base image
-- [x] Create Django image
-- [x] Create PostgreSQL image
-- [ ] Create Mysql/Mariadb image
-- [ ] See if Pillow/Celery image would fit the repository.
-- [x] Write a somewhat comprehensive documentation/readme.
-- [x] Add MIT license
-- [x] Correctly format the readme with links and anchors.
-- [ ] Port all images to ARM arch
+- [x] DONE: Update and test tiangolo's alpine base image
+- [x] DONE: Create Django image
+- [x] DONE: Create PostgreSQL image
+- [ ] PENDING: Create Mysql/Mariadb image
+- [ ] PENDING: See if Pillow/Celery image would fit the repository.
+- [x] DONE: Write a somewhat comprehensive documentation/readme.
+- [x] DONE: Add MIT license
+- [x] DONE: Correctly format the readme with links and anchors.
+- [ ] PENDING: Port all images to ARM arch
 
 ## <a name=license></a> License
 
