@@ -1,6 +1,7 @@
 FROM python:3.9.6-alpine3.14
 
 LABEL maintainer="Iván Sánchez <surister@gmail.com>"
+
 # Original Image:
 # https://github.com/tiangolo/meinheld-gunicorn-docker/blob/master/docker-images/python3.8-alpine3.11.dockerfile
 #
