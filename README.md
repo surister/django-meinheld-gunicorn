@@ -1,21 +1,41 @@
 Last documentation update: 2021-08-05. This is still a WIP.
 
-## Tags:
+# Index
 
-- `base-python3.9.6-alpine3.14`
-- `python3.9.6-alpine3.14`
-- `python3.9.6-alpine3.14-postgresql`
+- [Tags](#tags)
+- [Links](#interesting-links)
+- [About the repository](#about)
+- [Why the respository](#why)
+- [Environment variables](#environment)
+- [Base image explanation](#the-base-image)
+- [Running the images](#running-a-basic-django-project)
+  - [Simple example](#a-simple-example)
+  - [Passing source files at build time](#passing-source-files-at-build-time)
+  - [Installing extra packages](#installing-extra-packages)
+- [Docker-compose](#docker-compose)
+  - [Simple example](#a-simple-django-docker-compose-example)
+  - [Simple example with installed packages](#a-django-docker-compose-example-following-the-installing-extra-packagesinstallingpackages)
+  - [Complete example (With PostgreSQL and adminer)](#a-more-complete-example-with-postgresql)
+- [Image sizes](#image-sizes)
+- [License](#license)
 
-## Links
+
+## <a name=tags></a> Tags:
+
+- [base-python3.9.6-alpine3.14](https://github.com/surister/django-meinheld-gunicorn/blob/master/dockerfiles/base-python3.9.6-alpine3.14.dockerfile)
+- [python3.9.6-alpine3.14](https://github.com/surister/django-meinheld-gunicorn/blob/master/dockerfiles/python3.9.6-alpine3.14.dockerfile)
+- [python3.9.6-alpine3.14-postgresql](https://github.com/surister/django-meinheld-gunicorn/blob/master/dockerfiles/python3.9.6-alpine3.14-postgresql.dockerfile)
+
+## <a name=interesting-links></a> Links
 
 - Dockerhub: https://hub.docker.com/r/surister/django-meinheld-gunicorn
 - Github: https://github.com/surister/django-meinheld-gunicorn
 
-## What does this repository offer?
+## <a name=about></a> About: What does this repository offer?
 
 This repository offers Django production-grade docker images with several flavors.
 
-## Why this repository?
+## <a name=why></a> Why this repository?
 
 This repository is based on https://github.com/tiangolo/meinheld-gunicorn-docker. As of the time of writing the images
 have not been updated for 15 months. This is problematic and several issues arise:
@@ -35,9 +55,11 @@ have not been updated for 15 months. This is problematic and several issues aris
 
 This repository aims to solve those issues.
 
-## The base image.
+## <a name=the-base-image></a> The base image.
 
-`$ docker pull surister/django-meinheld-gunicorn:base-python3.9.6-alpine3.14`
+```
+$ docker pull surister/django-meinheld-gunicorn:base-python3.9.6-alpine3.14
+```
 
 This image is the base of all other alpine images.
 
@@ -47,15 +69,24 @@ but updated.
 
 All the other images are Django focused.
 
-## Running a basic Django project.
+## <a name=environment></a> Environment variables
+
+  `MODULE_NAME`
+
+## <a name=running-a-basic-django-project></a> Running a basic Django project.
 
 We start a Django project called 'sampletest'
 
-`$ django-admin startproject sampletest`
+```bash
+$ django-admin startproject sampletest
+```
 
-We run the project attaching the source files in a volume.
 
-`$ sudo docker run -d --name sampletest -p 8000:80 -v ~/sampletest/:/app/ -e MODULE_NAME=sampletest.wsgi surister/django-meinheld-gunicorn:python3.9.6-alpine3.14 `
+### <a name=a-simple-example></a> A simple example
+
+```bash
+$ sudo docker run -d --name sampletest -p 8000:80 -v ~/sampletest/:/app/ -e MODULE_NAME=sampletest.wsgi surister/django-meinheld-gunicorn:python3.9.6-alpine3.14
+```
 
 What does it do?
 
@@ -82,7 +113,7 @@ We curl the port
     ...
 ```
 
-### Passing source files at build time
+### <a name=passing-source-files-at-build-time></a> Passing source files at build time
 
 If you do not want to pass the source files in an attached volume, you can extend the image and the files at build time:
 
@@ -115,7 +146,7 @@ $ sudo docker build -t django-test .
 $ sudo docker run -e MODULE_NAME=django-test.wsgi -p 8000:80 django-test
 ```
 
-### <a name="installingpackages"></a>Installing extra packages.
+### <a name=installing-extra-packages></a> Installing extra packages.
 
 The images come with Gunicorn, Meinheld and Django installed, besides this, depending on the flavor they may have extra
 packages.
@@ -310,9 +341,9 @@ WORKDIR /app
 RUN pip install --no-cache-dir -r requirements.txt
 ```
 
-## Docker-compose
+## <a name=docker-compose></a> Docker-compose
 
-### A simple Django docker-compose example:
+### <a name=a-simple-django-docker-compose-example></a> A simple Django docker-compose example:
 
 ```yaml
 version: "3.9"
@@ -334,7 +365,7 @@ services:
 $ docker-compose up -d
 ```
 
-### A Django docker-compose example following the [Installing extra packages](#installingpackages).
+### <a name=a-django-docker-compose-example-following-the-installing-extra-packagesinstallingpackages></a> A Django docker-compose example following the [Installing extra packages](#installing-extra-packages).
 
 Dockerfile
 
@@ -388,7 +419,7 @@ and
 $ docker-compose up -d --build
 ```
 
-### A more complete example with PostgreSQL.
+### <a name=a-more-complete-example-with-postgresql></a> A more complete example with PostgreSQL.
 
 ```yaml
 version: "3.9"
@@ -445,7 +476,30 @@ DATABASES = {
 }
 ```
 
-## License
+## <a name=image-sizes></a> Image sizes
+
+Base image is approximately `53.2MB`.
+
+Django images are `80.2MB` and postgreSQL is `82MB`
+
+Every image removes caches and unused files at build time to ensure minimal size.
+
+The [Simple example with installed packages](#a-django-docker-compose-example-following-the-installing-extra-packagesinstallingpackages)
+image is 84.1MB, as you can see images do to grow much when you install a lot of packages.
+
+## TODO
+
+- [x] Update and test tiangolo's alpine base image
+- [x] Create Django image
+- [x] Create PostgreSQL image
+- [ ] Create Mysql/Mariadb image
+- [ ] See if Pillow/Celery image would fit the repository.
+- [x] Write a somewhat comprehensive documentation/readme.
+- [x] Add MIT license
+- [x] Correctly format the readme with links and anchors.
+- [ ] Port all images to ARM arch
+
+## <a name=license></a> License
 
 This project is licensed under the terms of the MIT license.
 
