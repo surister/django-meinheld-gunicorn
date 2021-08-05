@@ -2,11 +2,35 @@ version: "3.9"
 
 services:
   django:
-    image: surister/django-meinheld-gunicorn:python3.9.6-alpine3.14
+    build:
+      dockerfile: /home/surister/django-test/django_project/Dockerfile # Change Dockerfile path as needed
+      context: /home/surister/django-test/django_project/ # Change context as needed, if your docker-compose.yml
+                                                          # file is in the same folder as the project
+                                                          # just write a dot: 'context: .'
     restart: unless-stopped
     ports:
       - 8000:80
-    volumes:
-      - /home/surister/django-test/django_project:/app/
     environment:
       - MODULE_NAME=django_project.wsgi
+
+  postgres:
+    image: postgres
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+    environment:
+      - POSTGRES_PASSWORD=pgpassword
+      - POSTGRES_USER=pguser
+      - POSTGRES_DB=pgdb
+
+    ports:
+      - 5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8075:8080
+
+volumes:
+  pg_data:

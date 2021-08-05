@@ -141,17 +141,18 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir -r requirements.txt
 ```
+
 Running this image is the same procedure as running for example: `python3.9.6-alpine3.14-postgresql`
+
 ```bash
 $ sudo docker run -d --name sampletest -p 8000:80 -v ~/sampletest/:/app/ -e MODULE_NAME=sampletest.wsgi mynewlybuildimage
 ```
 
-
 Now, this will work for some packages but odds are that they some will fail at build time because of missing
 dependencies.
 
-There is no generic Dockerfile that will build every package while maintaining its small size, you will have to tweak it to find the
-correct build for your project.
+There is no generic Dockerfile that will build every package while maintaining its small size, you will have to tweak it
+to find the correct build for your project.
 
 Let me walk you trough a real world example.
 
@@ -262,8 +263,8 @@ urllib3==1.26.6
 vine==5.0.0
 wcwidth==0.2.5
 ```
-If we try to build it
-the first problem we find is with `cryptography==3.4.7`.
+
+If we try to build it the first problem we find is with `cryptography==3.4.7`.
 
 It outputs: `Fatal error: ffi.h: No such file or directory` with a quick Google search I find that `ffi.h` lives in the
 package `libffi-dev`
@@ -311,7 +312,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 ## Docker-compose
 
-A simple Django docker-compose example:
+### A simple Django docker-compose example:
 
 ```yaml
 version: "3.9"
@@ -323,13 +324,127 @@ services:
     ports:
       - 8000:80
     volumes:
-      - /home/surister/django-test/django_project:/app/
+      - /home/surister/django-test/django_project:/app/ # Change project path as needed
     environment:
       - MODULE_NAME=django_project.wsgi
 
 ```
 
-A Django docker-compose example following the [Installing extra packages](#installingpackages).
+```bash
+$ docker-compose up -d
+```
+
+### A Django docker-compose example following the [Installing extra packages](#installingpackages).
+
+Dockerfile
+
+```Dockerfile
+FROM surister/django-meinheld-gunicorn:python3.9.6-alpine3.14-postgresql
+
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    musl-dev \
+    && apk del --no-cache .build-deps
+    
+COPY . /app/
+WORKDIR /app
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+```
+
+docker-compose.yml
+
+```yaml
+version: "3.9"
+
+services:
+  django:
+    build:
+      dockerfile: /home/surister/django-test/django_project/Dockerfile # Change Dockerfile path as needed
+      context: /home/surister/django-test/django_project/ # Change context as needed, if your docker-compose.yml 
+        # file is in the same folder as the project 
+      # just write a dot: 'context: .'
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    environment:
+      - MODULE_NAME=django_project.wsgi
+```
+
+```bash
+$ docker-compose up -d
+```
+
+If you change your project files you will have to rebuild
+
+```bash
+$ docker-compose down
+```
+
+and
+
+```bash
+$ docker-compose up -d --build
+```
+
+### A more complete example with PostgreSQL.
+
+```yaml
+version: "3.9"
+
+services:
+  django:
+    build:
+      dockerfile: /home/surister/django-test/django_project/Dockerfile # Change Dockerfile path as needed
+      context: /home/surister/django-test/django_project/ # Change context as needed, if your docker-compose.yml
+                                                          # file is in the same folder as the project
+                                                          # just write a dot: 'context: .'
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    environment:
+      - MODULE_NAME=django_project.wsgi
+
+  postgres:
+    image: postgres
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+    environment:
+      - POSTGRES_PASSWORD=pgpassword
+      - POSTGRES_USER=pguser
+      - POSTGRES_DB=pgdb
+
+    ports:
+      - 5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8075:8080
+
+volumes:
+  pg_data:
+
+```
+
+Bare in mind that you will have to change your `DATABASES` settings
+
+```python
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'pgdb',
+    'USER': 'pguser',
+    'PASSWORD': 'pgpassword',
+    'HOST': 'postgres',
+    'PORT': '5432',
+  }
+}
+```
+
 ## License
 
 This project is licensed under the terms of the MIT license.
