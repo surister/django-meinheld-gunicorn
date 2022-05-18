@@ -1,4 +1,4 @@
-Last documentation update: 2021-08-05. This is still a WIP.
+### Production-ready django docker images.
 
 # Index
 
@@ -22,6 +22,10 @@ Last documentation update: 2021-08-05. This is still a WIP.
 
 ## <a name=tags></a> Tags:
 
+### Debian Based
+
+
+### Alpine Based
 - [base-python3.9.6-alpine3.14](https://github.com/surister/django-meinheld-gunicorn/blob/master/dockerfiles/base-python3.9.6-alpine3.14.dockerfile)
 - [python3.9.6-alpine3.14](https://github.com/surister/django-meinheld-gunicorn/blob/master/dockerfiles/python3.9.6-alpine3.14.dockerfile)
 - [python3.9.6-alpine3.14-postgresql](https://github.com/surister/django-meinheld-gunicorn/blob/master/dockerfiles/python3.9.6-alpine3.14-postgresql.dockerfile)
